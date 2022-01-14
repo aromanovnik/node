@@ -2,6 +2,8 @@ const colors = require('colors');
 const [minimal, maximum] = process.argv.slice(2);
 let [min, max] = [+minimal, +maximum];
 
+console.log('Lesson 1');
+
 const getNumbers = (_min, _max) => {
     const numbers = [];
 
