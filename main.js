@@ -7,18 +7,31 @@ const es = require('event-stream')
 const FILE = './access.log';
 const IPs = ['89.123.1.41', '34.48.240.111'];
 const PREFIX = '_requests.log';
+const streams = {};
 
 const getFilURL = (ip) => {
     return `./${ip}${PREFIX}`;
 }
 
-const write = (ip, line) => {
-    console.log('ip => ', ip, line);
-    const writeStream = fs.createWriteStream(getFilURL(ip), {
+const createStream = (fileURL) => {
+    if (!fileURL) {
+        return;
+    }
+
+    if (streams[fileURL]) {
+        return streams[fileURL];
+    }
+
+    streams[fileURL] = fs.createWriteStream(fileURL, {
         encoding: 'utf-8',
         flags: 'a',
     });
-    writeStream.write(`${line}\n`);
+}
+
+const write = (ip, line) => {
+    console.log('ip => ', ip, line);
+    const writeStream = createStream(getFilURL(ip));
+    writeStream?.write(`${line}\n`);
 
 }
 

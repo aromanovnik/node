@@ -19,7 +19,9 @@
   "homepage": "https://github.com/aromanovnik/node#readme",
   "dependencies": {
     "colors": "^1.4.0",
-    "event-stream": "^4.0.1"
+    "event-stream": "^4.0.1",
+    "inquirer": "^8.2.0",
+    "yargs": "^17.3.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
