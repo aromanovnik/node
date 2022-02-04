@@ -1,49 +1,95 @@
 /***
+ * LESSON 5
+ * ***/
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const url = require('url');
+
+
+const showList = (_path) => {
+    try {
+        const fileList = fs.readdirSync(_path);
+        let html = '';
+        for(let i = 0; i < fileList.length; i++) {
+            html += `<a href="./${fileList[i]}">${fileList[i]}</a> <br/>`
+        }
+        return html;
+    } catch (error)  {
+        return null;
+    }
+}
+
+const server = http.createServer((req, res) => {
+    if (req.method !== 'GET') {
+        return res.end('...');
+    }
+    const _url = url.parse(req.url, true);
+    const fullPath = path.join(__dirname, '.' + _url.path);
+   try {
+       if (fs.lstatSync(fullPath).isDirectory()) {
+           const list = showList(fullPath);
+           res.end(list);
+       } else {
+           const data = fs.readFileSync(fullPath, 'utf-8');
+           res.end(data);
+       }
+   } catch {
+       res.writeHead(404, {
+           'Content-Type': 'text/html',
+       });
+       res.end('404');
+   }
+});
+
+server.listen(5555);
+
+/***
  * LESSON 3
  * ***/
-const fs = require('fs');
-const es = require('event-stream')
-
-const FILE = './access.log';
-const IPs = ['89.123.1.41', '34.48.240.111'];
-const PREFIX = '_requests.log';
-const streams = {};
-
-const getFilURL = (ip) => {
-    return `./${ip}${PREFIX}`;
-}
-
-const createStream = (fileURL) => {
-    if (!fileURL) {
-        return;
-    }
-
-    if (streams[fileURL]) {
-        return streams[fileURL];
-    }
-
-    streams[fileURL] = fs.createWriteStream(fileURL, {
-        encoding: 'utf-8',
-        flags: 'a',
-    });
-}
-
-const write = (ip, line) => {
-    console.log('ip => ', ip, line);
-    const writeStream = createStream(getFilURL(ip));
-    writeStream?.write(`${line}\n`);
-
-}
-
-fs.createReadStream(FILE, {flags: 'r'})
-    .pipe(es.split(/(\r?\n)/))
-    .pipe(es.map((line, cb) => {
-        const ip = IPs.find(ip => line.indexOf(ip) > -1);
-        if (ip) {
-            write(ip, line);
-        }
-        cb(null, line)
-    }))
+// const fs = require('fs');
+// const es = require('event-stream')
+//
+// const FILE = './access.log';
+// const IPs = ['89.123.1.41', '34.48.240.111'];
+// const PREFIX = '_requests.log';
+// const streams = {};
+//
+// const getFilURL = (ip) => {
+//     return `./${ip}${PREFIX}`;
+// }
+//
+// const createStream = (fileURL) => {
+//     if (!fileURL) {
+//         return;
+//     }
+//
+//     if (streams[fileURL]) {
+//         return streams[fileURL];
+//     }
+//
+//     streams[fileURL] = fs.createWriteStream(fileURL, {
+//         encoding: 'utf-8',
+//         flags: 'a',
+//     });
+// }
+//
+// const write = (ip, line) => {
+//     console.log('ip => ', ip, line);
+//     const writeStream = createStream(getFilURL(ip));
+//     writeStream?.write(`${line}\n`);
+//
+// }
+//
+// fs.createReadStream(FILE, {flags: 'r'})
+//     .pipe(es.split(/(\r?\n)/))
+//     .pipe(es.map((line, cb) => {
+//         const ip = IPs.find(ip => line.indexOf(ip) > -1);
+//         if (ip) {
+//             write(ip, line);
+//         }
+//         cb(null, line)
+//     }))
 
 
 /***
